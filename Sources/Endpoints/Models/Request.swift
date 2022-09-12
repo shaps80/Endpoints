@@ -1,9 +1,9 @@
 import Foundation
 
 public struct Request {
-    var path: String
-    var queries: [Query] = []
-    var headers: [Header] = [
+    public var path: String
+    public var queries: [Query] = []
+    public var headers: [Header] = [
         Header(\.contentType, value: .json),
         Header(\.accept, value: .json)
     ]

@@ -20,7 +20,7 @@ public extension Endpoint {
     var method: Method { .GET }
 }
 
-internal extension Endpoint {
+public extension Endpoint {
     func urlRequest(baseUrl: URL) throws -> URLRequest {
         let url = baseUrl
 
