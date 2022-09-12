@@ -101,7 +101,7 @@ private struct MockEncodableEndpoint: EncodableEndpoint {
         MockGist(id: "0", description: "description", updated: Date())
     }
 
-    var path: Path {
+    var request: Request {
         .init(path: "")
     }
 }
@@ -115,7 +115,7 @@ private struct MockCodableEndpoint: CodableEndpoint {
     var body: some Encodable {
         MockGist(id: "-1", description: "description", updated: Date())
     }
-    var path: Path {
+    var request: Request {
         .init(path: "success")
     }
 }
@@ -126,7 +126,7 @@ private extension EncodableEndpoint where Self == MockCodableEndpoint {
 
 private struct MockDataEndpoint: DecodableEndpoint {
     typealias Output = Data
-    var path: Path {
+    var request: Request {
         .init(path: "")
     }
 }
@@ -138,7 +138,7 @@ private struct MockJSONEndpoint: DecodableEndpoint {
         decoder.dateDecodingStrategy = .secondsSince1970
         return decoder
     }
-    var path: Path
+    var request: Request
 }
 
 extension Endpoint where Self == MockDataEndpoint {
@@ -147,14 +147,14 @@ extension Endpoint where Self == MockDataEndpoint {
 
 extension Endpoint where Self == MockJSONEndpoint {
     static func mockJSON(filename: String) -> Self {
-        .init(path: .init(path: filename))
+        .init(request: .init(path: filename))
     }
 }
 
 private struct MockDomain: Domain {
-    func request<E>(for endpoint: E) async throws -> URLRequest where E : Endpoint {
-        guard let url = Bundle.module.url(forResource: endpoint.path.path, withExtension: "json") else {
-            throw EndpointError.badEndpoint("Mock file missing from bundle: \(endpoint.path)")
+    func urlRequest<E>(for endpoint: E) async throws -> URLRequest where E: Endpoint {
+        guard let url = Bundle.module.url(forResource: endpoint.request.path, withExtension: "json") else {
+            throw EndpointError.badEndpoint("Mock file missing from bundle: \(endpoint.request)")
         }
 
         return URLRequest(url: url)

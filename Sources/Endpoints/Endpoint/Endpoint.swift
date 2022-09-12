@@ -13,7 +13,7 @@ public protocol Endpoint {
     /// The path associated with this endpoint
     ///
     /// - Note: This value will be appended to the `URL` provided by `Domain`
-    var path: Path { get }
+    var request: Request { get }
 
     /// The cache policy to apply to this endpoint
     var cachePolicy: URLRequest.CachePolicy { get }
@@ -47,41 +47,41 @@ public extension Endpoint {
     var allowsConstrainedNetworkAccess: Bool { true }
 }
 
-public extension Endpoint {
-    func request(baseUrl: URL) throws -> URLRequest {
+internal extension Endpoint {
+    func urlRequest(baseUrl: URL) throws -> URLRequest {
         let url = baseUrl
 
         guard var components = URLComponents(url: baseUrl, resolvingAgainstBaseURL: false) else {
             throw EndpointError.badEndpoint("Unable to construct URL from endpoint: \(self) – baseURL: \(url)")
         }
 
-        let queries = path.queries
+        let queries = request.queries
             .filter { $0.value != nil }
-            .map { URLQueryItem(name: $0.name, value: $0.value!.description) }
+            .compactMap { $0.queryItem }
 
         var items = components.queryItems ?? []
         items.append(contentsOf: queries)
         if !items.isEmpty { components.queryItems = items }
 
-        guard let url = components.url?.appendingPathComponent(path.path) else {
+        guard let url = components.url?.appendingPathComponent(request.path) else {
             throw EndpointError.badEndpoint("Unable to construct URL from endpoint: \(self) – baseURL: \(url)")
         }
 
-        var request = URLRequest(
+        var urlRequest = URLRequest(
             url: url,
             cachePolicy: cachePolicy,
             timeoutInterval: timeout
         )
 
-        let headers = path.headers
+        let headers = request.headers
             .map { ($0.name, $0.value?.description) }
 
-        request.httpMethod = method.rawValue
-        request.allHTTPHeaderFields = Dictionary(headers) { h1, _ in h1 }.compactMapValues { $0 }
-        request.allowsCellularAccess = allowsCellularAccess
-        request.allowsExpensiveNetworkAccess = allowsExpensiveNetworkAccess
-        request.allowsConstrainedNetworkAccess = allowsConstrainedNetworkAccess
+        urlRequest.httpMethod = method.rawValue
+        urlRequest.allHTTPHeaderFields = Dictionary(headers) { h1, _ in h1 }.compactMapValues { $0 }
+        urlRequest.allowsCellularAccess = allowsCellularAccess
+        urlRequest.allowsExpensiveNetworkAccess = allowsExpensiveNetworkAccess
+        urlRequest.allowsConstrainedNetworkAccess = allowsConstrainedNetworkAccess
 
-        return request
+        return urlRequest
     }
 }

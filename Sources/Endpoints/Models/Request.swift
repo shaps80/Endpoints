@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Path {
+public struct Request {
     var path: String
     var queries: [Query] = []
     var headers: [Header] = [

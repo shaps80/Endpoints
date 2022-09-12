@@ -3,7 +3,7 @@ import Foundation
 /// An internal type for performing low-level data-only requests
 public struct AnyDataEndpoint: Endpoint {
     public var method: Method
-    public var path: Path
+    public var request: Request
     public var queries: [Query]
     public var headers: [Header]
     public var cachePolicy: URLRequest.CachePolicy
@@ -14,9 +14,9 @@ public struct AnyDataEndpoint: Endpoint {
 
     public init<E: Endpoint>(_ endpoint: E) {
         self.method = endpoint.method
-        self.path = endpoint.path
-        self.queries = endpoint.path.queries
-        self.headers = endpoint.path.headers
+        self.request = endpoint.request
+        self.queries = endpoint.request.queries
+        self.headers = endpoint.request.headers
         self.cachePolicy = endpoint.cachePolicy
         self.timeout = endpoint.timeout
         self.allowsCellularAccess = endpoint.allowsCellularAccess

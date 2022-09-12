@@ -15,7 +15,7 @@ public struct Curl: CustomStringConvertible, CustomDebugStringConvertible {
     public let name: String
 
     public init<E: Endpoint>(_ endpoint: E, domain: Domain) async throws {
-        let request = try await domain.request(for: endpoint)
+        let request = try await domain.urlRequest(for: endpoint)
         self.init(request)
     }
 

@@ -1,9 +1,5 @@
 import SwiftUI
 
-#if canImport(Logging)
-import Logging
-#endif
-
 /// Represents a session for an EndpointService
 ///
 /// Typically this wraps the `shared` URLSession instance. However you
@@ -141,9 +137,9 @@ private extension EndpointService {
             let result = try endpoint.encode()
 
 #if canImport(Logging)
-            Logger.encoding.info("􀆅 \(endpoint.path) | \(E.Input.self)")
+            Logger.encoding.info("􀆅 \(endpoint.urlRequest) | \(E.Input.self)")
 #else
-            debugPrint("􀆅 \(endpoint.path) | \(E.Input.self)")
+            debugPrint("􀆅 \(endpoint.request) | \(E.Input.self)")
 #endif
 
             return result
@@ -159,9 +155,9 @@ private extension EndpointService {
             let result = try endpoint.decode(data)
 
 #if canImport(Logging)
-            Logger.decoding.info("􀆅 \(endpoint.path) | \(E.Output.self)")
+            Logger.decoding.info("􀆅 \(endpoint.urlRequest) | \(E.Output.self)")
 #else
-            debugPrint("􀆅 \(endpoint.path) | \(E.Output.self)")
+            debugPrint("􀆅 \(endpoint.request) | \(E.Output.self)")
 #endif
             return result
         } catch let DecodingError.dataCorrupted(context) {
@@ -179,9 +175,9 @@ private extension EndpointService {
 
     func throwError<E: Endpoint>(error: Error, status: Int, endpoint: E) throws -> Never {
 #if canImport(Logging)
-        Logger.response.error("􀅾 \(status) | \(endpoint.method.rawValue) \(endpoint.path) | \(error.localizedDescription)")
+        Logger.response.error("􀅾 \(status) | \(endpoint.method.rawValue) \(endpoint.urlRequest) | \(error.localizedDescription)")
 #else
-        debugPrint("􀅾 \(status) | \(endpoint.method.rawValue) \(endpoint.path) | \(error.localizedDescription)")
+        debugPrint("􀅾 \(status) | \(endpoint.method.rawValue) \(endpoint.request) | \(error.localizedDescription)")
 #endif
 
         throw error
@@ -189,13 +185,13 @@ private extension EndpointService {
 
     func perform<E: Endpoint>(_ endpoint: E, from domain: Domain, data: Data?) async throws -> (Data, HTTPURLResponse) {
         let start = Date()
-        var request = try await domain.request(for: endpoint)
+        var request = try await domain.urlRequest(for: endpoint)
         request.httpBody = data
 
 #if canImport(Logging)
-        Logger.request.info("􀍠 \(endpoint.method.rawValue) \(endpoint.path)")
+        Logger.urlRequest.info("􀍠 \(endpoint.method.rawValue) \(endpoint.urlRequest)")
 #else
-        debugPrint("􀍠 \(endpoint.method.rawValue) \(endpoint.path)")
+        debugPrint("􀍠 \(endpoint.method.rawValue) \(endpoint.request)")
 #endif
 
         let (data, response) = try await session.data(for: request)
@@ -211,9 +207,9 @@ private extension EndpointService {
         let interval = end.timeIntervalSinceReferenceDate - start.timeIntervalSinceReferenceDate
 
 #if canImport(Logging)
-        Logger.response.info("􀆅 \(endpoint.method.rawValue) \(endpoint.path) (\(interval)s)")
+        Logger.response.info("􀆅 \(endpoint.method.rawValue) \(endpoint.urlRequest) (\(interval)s)")
 #else
-        debugPrint("􀆅 \(endpoint.method.rawValue) \(endpoint.path) (\(interval)s)")
+        debugPrint("􀆅 \(endpoint.method.rawValue) \(endpoint.request) (\(interval)s)")
 #endif
         return (data, httpResponse)
     }

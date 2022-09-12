@@ -33,6 +33,18 @@ public struct Query {
     }
 }
 
+extension Query: CustomStringConvertible {
+    public var description: String {
+        "\(name): \(value ?? "<none>")"
+    }
+}
+
+extension Query {
+    var queryItem: URLQueryItem? {
+        value.flatMap { .init(name: name, value: "\($0)") }
+    }
+}
+
 public protocol Queries {
     var queries: [Query] { get }
 }

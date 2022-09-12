@@ -32,6 +32,12 @@ public struct Header {
     }
 }
 
+extension Header: CustomStringConvertible {
+    public var description: String {
+        "\(name): \(value ?? "<none>")"
+    }
+}
+
 public protocol Headers {
     var headers: [Header] { get }
 }
