@@ -34,6 +34,12 @@ public final class EndpointService {
     }
 }
 
+public extension EndpointService {
+    func perform<E>(_ endpoint: E, from domain: Domain) async throws -> HTTPURLResponse where E: Endpoint {
+        try await perform(endpoint, from: domain, data: nil).1
+    }
+}
+
 // MARK: Codable
 
 public extension EndpointService {

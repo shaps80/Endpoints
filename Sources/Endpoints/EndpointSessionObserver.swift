@@ -29,7 +29,7 @@ public final class EndpointPrintLogger: EndpointServiceObserver {
     public init() { }
 
     public func service<E>(_ service: EndpointService, didEncode endpoint: E, for domain: Domain) where E: EncodableEndpoint {
-        print("􀍠 [end] \(endpoint.method.rawValue) \(endpoint.request.path) | \(E.Input.self)")
+        print("􀍠 [enc] \(endpoint.method.rawValue) \(endpoint.request.path) | \(E.Input.self)")
     }
 
     public func service<E>(_ service: EndpointService, didDecode endpoint: E, for domain: Domain) where E: DecodableEndpoint {
