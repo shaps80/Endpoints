@@ -14,37 +14,10 @@ public protocol Endpoint {
     ///
     /// - Note: This value will be appended to the `URL` provided by `Domain`
     var request: Request { get }
-
-    /// The cache policy to apply to this endpoint
-    var cachePolicy: URLRequest.CachePolicy { get }
-
-    /// The timeout to apply to this endpoint
-    var timeout: TimeInterval { get }
-
-    /// If true, the request may still be performed even if only a cellular interface is available. Defaults to `true`
-    ///
-    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    var allowsCellularAccess: Bool { get }
-
-    /// If true, the request may still be performed even if there are no non-expensive interfaces available (e.g. Hot-spot). Defaults to `true`
-    ///
-    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    var allowsExpensiveNetworkAccess: Bool { get }
-
-    /// If true, the request may still be performed even if the user has specified Low Data Mode. Defaults to `true`
-    ///
-    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    var allowsConstrainedNetworkAccess: Bool { get }
-
 }
 
 public extension Endpoint {
     var method: Method { .GET }
-    var cachePolicy: URLRequest.CachePolicy { .useProtocolCachePolicy }
-    var timeout: TimeInterval { 60 }
-    var allowsCellularAccess: Bool { true }
-    var allowsExpensiveNetworkAccess: Bool { true }
-    var allowsConstrainedNetworkAccess: Bool { true }
 }
 
 internal extension Endpoint {
@@ -69,8 +42,8 @@ internal extension Endpoint {
 
         var urlRequest = URLRequest(
             url: url,
-            cachePolicy: cachePolicy,
-            timeoutInterval: timeout
+            cachePolicy: request.cachePolicy,
+            timeoutInterval: request.timeout
         )
 
         let headers = request.headers
@@ -78,9 +51,9 @@ internal extension Endpoint {
 
         urlRequest.httpMethod = method.rawValue
         urlRequest.allHTTPHeaderFields = Dictionary(headers) { h1, _ in h1 }.compactMapValues { $0 }
-        urlRequest.allowsCellularAccess = allowsCellularAccess
-        urlRequest.allowsExpensiveNetworkAccess = allowsExpensiveNetworkAccess
-        urlRequest.allowsConstrainedNetworkAccess = allowsConstrainedNetworkAccess
+        urlRequest.allowsCellularAccess = request.allowsCellularAccess
+        urlRequest.allowsExpensiveNetworkAccess = request.allowsExpensiveNetworkAccess
+        urlRequest.allowsConstrainedNetworkAccess = request.allowsConstrainedNetworkAccess
 
         return urlRequest
     }

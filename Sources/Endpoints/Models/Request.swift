@@ -8,23 +8,78 @@ public struct Request {
         Header(\.accept, value: .json)
     ]
 
-    public init(path: String) {
+    /// The cache policy to apply to this endpoint
+    public var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
+
+    /// The timeout to apply to this endpoint
+    public var timeout: TimeInterval = 60
+
+    /// If true, the request may still be performed even if only a cellular interface is available. Defaults to `true`
+    ///
+    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
+    public var allowsCellularAccess: Bool = true
+
+    /// If true, the request may still be performed even if there are no non-expensive interfaces available (e.g. Hot-spot). Defaults to `true`
+    ///
+    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
+    public var allowsExpensiveNetworkAccess: Bool = true
+
+    /// If true, the request may still be performed even if the user has specified Low Data Mode. Defaults to `true`
+    ///
+    /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
+    public var allowsConstrainedNetworkAccess: Bool = true
+}
+
+public extension Request {
+    init(path: String) {
         self.path = path
     }
 
-    public init(path: String, @QueryBuilder queries: () -> [Query]) {
+    init(path: String, @QueryBuilder queries: () -> [Query]) {
         self.path = path
         self.queries = queries()
     }
 
-    public init(path: String, @HeadersBuilder headers: () -> [Header]) {
+    init(path: String, @HeadersBuilder headers: () -> [Header]) {
         self.path = path
         self.headers = headers()
     }
 
-    public init(path: String, @QueryBuilder queries: () -> [Query], @HeadersBuilder headers: () -> [Header]) {
+    init(path: String, @QueryBuilder queries: () -> [Query], @HeadersBuilder headers: () -> [Header]) {
         self.path = path
         self.queries = queries()
         self.headers = headers()
+    }
+}
+
+public extension Request {
+    func cachePolicy(_ policy: URLRequest.CachePolicy) -> Self {
+        var copy = self
+        copy.cachePolicy = policy
+        return copy
+    }
+
+    func timeout(_ timeout: TimeInterval) -> Self {
+        var copy = self
+        copy.timeout = timeout
+        return copy
+    }
+
+    func allowsCellularAccess(_ allowed: Bool) -> Self {
+        var copy = self
+        copy.allowsCellularAccess = allowed
+        return copy
+    }
+
+    func allowsExpensiveNetworkAccess(_ allowed: Bool) -> Self {
+        var copy = self
+        copy.allowsExpensiveNetworkAccess = allowed
+        return copy
+    }
+
+    func allowsConstrainedNetworkAccess(_ allowed: Bool) -> Self {
+        var copy = self
+        copy.allowsConstrainedNetworkAccess = allowed
+        return copy
     }
 }
