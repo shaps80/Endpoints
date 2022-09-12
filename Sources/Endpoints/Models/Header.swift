@@ -37,9 +37,7 @@ public protocol Headers {
 }
 
 extension Header: Headers {
-    public var headers: [Header] {
-        [.init(name: name, value: value)]
-    }
+    public var headers: [Header] { [self] }
 }
 
 extension Array: Headers where Element == Header {
@@ -53,27 +51,27 @@ public struct EmptyHeader: Headers {
 
 @resultBuilder
 public struct HeadersBuilder {
-    public static func buildBlock(_ components: Headers...) -> Headers {
+    public static func buildBlock(_ components: Headers...) -> [Header] {
         components.flatMap { $0.headers }
     }
 
-    public static func buildOptional(_ component: Headers?) -> Headers {
-        component ?? []
+    public static func buildOptional(_ component: Headers?) -> [Header] {
+        component.map { $0.headers } ?? []
     }
 
-    public static func buildEither(first component: Headers) -> Headers {
-        component
+    public static func buildEither(first component: Headers) -> [Header] {
+        component.headers
     }
 
-    public static func buildEither(second component: Headers) -> Headers {
-        component
+    public static func buildEither(second component: Headers) -> [Header] {
+        component.headers
     }
 
-    public static func buildArray(_ components: [Headers]) -> Headers {
+    public static func buildArray(_ components: [Headers]) -> [Header] {
         components.flatMap { $0.headers }
     }
 
-    public static func buildLimitedAvailability(_ component: Headers) -> Headers {
-        component
+    public static func buildLimitedAvailability(_ component: Headers) -> [Header] {
+        component.headers
     }
 }

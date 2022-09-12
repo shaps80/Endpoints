@@ -1,18 +1,30 @@
 import Foundation
 
-public struct Path: RawRepresentable {
-    public var rawValue: String
-    public init(rawValue: String) {
-        self.rawValue = rawValue
-    }
-}
+public struct Path {
+    var path: String
+    var queries: [Query] = []
+    var headers: [Header] = [
+        Header(\.contentType, value: .json),
+        Header(\.accept, value: .json)
+    ]
 
-extension Path: ExpressibleByStringInterpolation {
-    public init(stringLiteral value: String) {
-        rawValue = value
+    public init(path: String) {
+        self.path = path
     }
-}
 
-extension Path: CustomStringConvertible {
-    public var description: String { rawValue }
+    public init(path: String, @QueryBuilder queries: () -> [Query]) {
+        self.path = path
+        self.queries = queries()
+    }
+
+    public init(path: String, @HeadersBuilder headers: () -> [Header]) {
+        self.path = path
+        self.headers = headers()
+    }
+
+    public init(path: String, @QueryBuilder queries: () -> [Query], @HeadersBuilder headers: () -> [Header]) {
+        self.path = path
+        self.queries = queries()
+        self.headers = headers()
+    }
 }

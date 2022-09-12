@@ -15,12 +15,6 @@ public protocol Endpoint {
     /// - Note: This value will be appended to the `URL` provided by `Domain`
     var path: Path { get }
 
-    /// The query items to apply to this endpoint
-    @QueryBuilder var queries: Queries { get }
-
-    /// The HTTP headers to apply to this endpoint
-    @HeadersBuilder var headers: Headers { get }
-
     /// The cache policy to apply to this endpoint
     var cachePolicy: URLRequest.CachePolicy { get }
 
@@ -45,12 +39,6 @@ public protocol Endpoint {
 }
 
 public extension Endpoint {
-    @QueryBuilder var queries: Queries { EmptyQuery() }
-    @HeadersBuilder var headers: Headers {
-        Header(\.contentType, value: .json)
-        Header(\.accept, value: .json)
-    }
-
     var method: Method { .GET }
     var cachePolicy: URLRequest.CachePolicy { .useProtocolCachePolicy }
     var timeout: TimeInterval { 60 }
@@ -67,7 +55,7 @@ public extension Endpoint {
             throw EndpointError.badEndpoint("Unable to construct URL from endpoint: \(self) – baseURL: \(url)")
         }
 
-        let queries = queries.queries
+        let queries = path.queries
             .filter { $0.value != nil }
             .map { URLQueryItem(name: $0.name, value: $0.value!.description) }
 
@@ -75,7 +63,7 @@ public extension Endpoint {
         items.append(contentsOf: queries)
         if !items.isEmpty { components.queryItems = items }
 
-        guard let url = components.url?.appendingPathComponent(path.rawValue) else {
+        guard let url = components.url?.appendingPathComponent(path.path) else {
             throw EndpointError.badEndpoint("Unable to construct URL from endpoint: \(self) – baseURL: \(url)")
         }
 
@@ -85,7 +73,7 @@ public extension Endpoint {
             timeoutInterval: timeout
         )
 
-        let headers = headers.headers
+        let headers = path.headers
             .map { ($0.name, $0.value?.description) }
 
         request.httpMethod = method.rawValue

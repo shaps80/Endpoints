@@ -97,9 +97,12 @@ private struct MockSuccess: Decodable {
 }
 
 private struct MockEncodableEndpoint: EncodableEndpoint {
-    var path: Path = ""
     var body: some Encodable {
         MockGist(id: "0", description: "description", updated: Date())
+    }
+
+    var path: Path {
+        .init(path: "")
     }
 }
 
@@ -109,9 +112,11 @@ private extension EncodableEndpoint where Self == MockEncodableEndpoint {
 
 private struct MockCodableEndpoint: CodableEndpoint {
     typealias Output = MockSuccess
-    var path: Path = "success"
     var body: some Encodable {
         MockGist(id: "-1", description: "description", updated: Date())
+    }
+    var path: Path {
+        .init(path: "success")
     }
 }
 
@@ -121,7 +126,9 @@ private extension EncodableEndpoint where Self == MockCodableEndpoint {
 
 private struct MockDataEndpoint: DecodableEndpoint {
     typealias Output = Data
-    var path: Path = ""
+    var path: Path {
+        .init(path: "")
+    }
 }
 
 private struct MockJSONEndpoint: DecodableEndpoint {
@@ -131,7 +138,7 @@ private struct MockJSONEndpoint: DecodableEndpoint {
         decoder.dateDecodingStrategy = .secondsSince1970
         return decoder
     }
-    var path: Path = ""
+    var path: Path
 }
 
 extension Endpoint where Self == MockDataEndpoint {
@@ -139,12 +146,14 @@ extension Endpoint where Self == MockDataEndpoint {
 }
 
 extension Endpoint where Self == MockJSONEndpoint {
-    static func mockJSON(filename: String) -> Self { .init(path: .init(rawValue: filename)) }
+    static func mockJSON(filename: String) -> Self {
+        .init(path: .init(path: filename))
+    }
 }
 
 private struct MockDomain: Domain {
     func request<E>(for endpoint: E) async throws -> URLRequest where E : Endpoint {
-        guard let url = Bundle.module.url(forResource: endpoint.path.rawValue, withExtension: "json") else {
+        guard let url = Bundle.module.url(forResource: endpoint.path.path, withExtension: "json") else {
             throw EndpointError.badEndpoint("Mock file missing from bundle: \(endpoint.path)")
         }
 

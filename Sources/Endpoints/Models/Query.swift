@@ -38,9 +38,7 @@ public protocol Queries {
 }
 
 extension Query: Queries {
-    public var queries: [Query] {
-        [.init(name: name, value: value)]
-    }
+    public var queries: [Query] { [self] }
 }
 
 extension Array: Queries where Element == Query {
@@ -54,27 +52,27 @@ public struct EmptyQuery: Queries {
 
 @resultBuilder
 public struct QueryBuilder {
-    public static func buildBlock(_ components: Queries...) -> Queries {
+    public static func buildBlock(_ components: Queries...) -> [Query] {
         components.flatMap { $0.queries }
     }
 
-    public static func buildOptional(_ component: Queries?) -> Queries {
-        component ?? []
+    public static func buildOptional(_ component: Queries?) -> [Query] {
+        component.map { $0.queries } ?? []
     }
 
-    public static func buildEither(first component: Queries) -> Queries {
-        component
+    public static func buildEither(first component: Queries) -> [Query] {
+        component.queries
     }
 
-    public static func buildEither(second component: Queries) -> Queries {
-        component
+    public static func buildEither(second component: Queries) -> [Query] {
+        component.queries
     }
 
-    public static func buildArray(_ components: [Queries]) -> Queries {
+    public static func buildArray(_ components: [Queries]) -> [Query] {
         components.flatMap { $0.queries }
     }
 
-    public static func buildLimitedAvailability(_ component: Queries) -> Queries {
-        component
+    public static func buildLimitedAvailability(_ component: Queries) -> [Query] {
+        component.queries
     }
 }

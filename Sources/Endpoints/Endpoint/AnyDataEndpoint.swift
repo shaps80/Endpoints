@@ -15,8 +15,8 @@ public struct AnyDataEndpoint: Endpoint {
     public init<E: Endpoint>(_ endpoint: E) {
         self.method = endpoint.method
         self.path = endpoint.path
-        self.queries = endpoint.queries.queries
-        self.headers = endpoint.headers.headers
+        self.queries = endpoint.path.queries
+        self.headers = endpoint.path.headers
         self.cachePolicy = endpoint.cachePolicy
         self.timeout = endpoint.timeout
         self.allowsCellularAccess = endpoint.allowsCellularAccess
