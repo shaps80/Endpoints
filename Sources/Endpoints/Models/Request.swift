@@ -9,25 +9,25 @@ public struct Request {
     ]
 
     /// The cache policy to apply to this endpoint
-    public var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
+    var cachePolicy: URLRequest.CachePolicy = .useProtocolCachePolicy
 
     /// The timeout to apply to this endpoint
-    public var timeout: TimeInterval = 60
+    var timeout: TimeInterval = 60
 
     /// If true, the request may still be performed even if only a cellular interface is available. Defaults to `true`
     ///
     /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    public var allowsCellularAccess: Bool = true
+    var allowsCellularAccess: Bool = true
 
     /// If true, the request may still be performed even if there are no non-expensive interfaces available (e.g. Hot-spot). Defaults to `true`
     ///
     /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    public var allowsExpensiveNetworkAccess: Bool = true
+    var allowsExpensiveNetworkAccess: Bool = true
 
     /// If true, the request may still be performed even if the user has specified Low Data Mode. Defaults to `true`
     ///
     /// - Note: This setting also depends on n appropriate `URLSessionConfiguration`.
-    public var allowsConstrainedNetworkAccess: Bool = true
+    var allowsConstrainedNetworkAccess: Bool = true
 }
 
 public extension Request {
