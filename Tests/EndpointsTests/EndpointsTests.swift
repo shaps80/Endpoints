@@ -102,7 +102,7 @@ private struct MockEncodableEndpoint: EncodableEndpoint {
     }
 
     var request: Request {
-        .init(path: "")
+        Request(.get, path: "")
     }
 }
 
@@ -116,7 +116,7 @@ private struct MockCodableEndpoint: CodableEndpoint {
         MockGist(id: "-1", description: "description", updated: Date())
     }
     var request: Request {
-        .init(path: "success")
+        Request(.post, path: "success")
     }
 }
 
@@ -127,7 +127,7 @@ private extension EncodableEndpoint where Self == MockCodableEndpoint {
 private struct MockDataEndpoint: DecodableEndpoint {
     typealias Output = Data
     var request: Request {
-        .init(path: "")
+        .init(.get, path: "")
     }
 }
 
@@ -147,7 +147,7 @@ extension Endpoint where Self == MockDataEndpoint {
 
 extension Endpoint where Self == MockJSONEndpoint {
     static func mockJSON(filename: String) -> Self {
-        .init(request: .init(path: filename))
+        .init(request: .init(.get, path: filename))
     }
 }
 

@@ -1,6 +1,9 @@
 import Foundation
 
 public struct Request {
+    /// The HTTP method to apply to this endpoint.
+    /// Defaults to `.get` for `DecodableEndpoint` and `.post` for `EncodableEndpoint` types.
+    public var method: Method
     public var path: String
     public var queries: [Query] = []
     public var headers: [Header] = [
@@ -31,21 +34,25 @@ public struct Request {
 }
 
 public extension Request {
-    init(path: String) {
+    init(_ method: Method, path: String) {
+        self.method = method
         self.path = path
     }
 
-    init(path: String, @QueryBuilder queries: () -> [Query]) {
+    init(_ method: Method, path: String, @QueryBuilder queries: () -> [Query]) {
+        self.method = method
         self.path = path
         self.queries = queries()
     }
 
-    init(path: String, @HeadersBuilder headers: () -> [Header]) {
+    init(_ method: Method, path: String, @HeadersBuilder headers: () -> [Header]) {
+        self.method = method
         self.path = path
         self.headers = headers()
     }
 
-    init(path: String, @QueryBuilder queries: () -> [Query], @HeadersBuilder headers: () -> [Header]) {
+    init(_ method: Method, path: String, @QueryBuilder queries: () -> [Query], @HeadersBuilder headers: () -> [Header]) {
+        self.method = method
         self.path = path
         self.queries = queries()
         self.headers = headers()
@@ -81,5 +88,40 @@ public extension Request {
         var copy = self
         copy.allowsConstrainedNetworkAccess = allowed
         return copy
+    }
+}
+
+extension Request: CustomStringConvertible {
+    public var description: String {
+        "\(method.rawValue) /\(path)?\(queries)"
+    }
+}
+
+extension Request: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        var queriesDescription: String {
+            "Queries:\n" + queries.map {
+                "\t\($0)"
+            }
+            .joined(separator: "\n")
+        }
+
+        var headersDescription: String {
+            "Headers:\n" + headers.map {
+                "\t- \($0)"
+            }
+            .joined(separator: "\n")
+        }
+
+        switch (queries.count, headers.count) {
+        case (0, 0): // none
+            return "\(method.rawValue) /\(path)"
+        case (0, _): // queries
+            return "\(method.rawValue) /\(path)\n\(queries)"
+        case (_, 0): // headers
+            return "\(method.rawValue) /\(path)\n\(headers)"
+        case (_, _): // both
+            return "\(method.rawValue) /\(path)\n\(queries)\n\(headers)"
+        }
     }
 }

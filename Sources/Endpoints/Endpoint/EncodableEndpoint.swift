@@ -21,7 +21,6 @@ public protocol EncodableEndpoint: Endpoint {
 
 public extension EncodableEndpoint {
     var encoder: JSONEncoder { .init() }
-    var method: Method { .POST }
     func encode() throws -> Data {
         try encoder.encode(body)
     }

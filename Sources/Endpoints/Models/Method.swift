@@ -1,12 +1,12 @@
 import Foundation
 
 public extension Method {
-    static var GET: Self = "GET"
-    static var POST: Self = "POST"
-    static var PUT: Self = "PUT"
-    static var PATCH: Self = "PATCH"
-    static var UPDATE: Self = "UPDATE"
-    static var DELETE: Self = "DELETE"
+    static var get: Self = "GET"
+    static var post: Self = "POST"
+    static var put: Self = "PUT"
+    static var patch: Self = "PATCH"
+    static var update: Self = "UPDATE"
+    static var delete: Self = "DELETE"
 }
 
 public struct Method: RawRepresentable {

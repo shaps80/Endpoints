@@ -6,7 +6,7 @@ public struct AnyDataEndpoint: Endpoint {
     public var request: Request
 
     public init<E: Endpoint>(_ endpoint: E) {
-        self.method = endpoint.method
+        self.method = endpoint.request.method
         self.request = endpoint.request
     }
 }

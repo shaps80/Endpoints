@@ -20,7 +20,7 @@ public struct Query {
         self.value = value.rawValue
     }
 
-    public init<V>(_ keyPath: WritableKeyPath<Query, V>, value: V) {
+    public init<V>(_ keyPath: WritableKeyPath<Query, V>, _ value: V) {
         self[keyPath: keyPath] = value
     }
 
@@ -35,6 +35,13 @@ public struct Query {
 
 extension Query: CustomStringConvertible {
     public var description: String {
+        let v = "\(value ?? "")".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        return "\(name)=\(v)"
+    }
+}
+
+extension Query: CustomDebugStringConvertible {
+    public var debugDescription: String {
         "\(name): \(value ?? "<none>")"
     }
 }

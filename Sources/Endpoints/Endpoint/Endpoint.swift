@@ -6,18 +6,10 @@ public typealias CodableEndpoint = EncodableEndpoint & DecodableEndpoint
 /// Represents a simple Endpoint. Generally you don't use this directly,
 /// rather you should conform to `DecodableEndpoint`, `EncodableEndpoint` or both.
 public protocol Endpoint {
-    /// The HTTP method to apply to this endpoint.
-    /// Defaults to `.get` for `DecodableEndpoint` and `.post` for `EncodableEndpoint` types.
-    var method: Method { get }
-
     /// The path associated with this endpoint
     ///
     /// - Note: This value will be appended to the `URL` provided by `Domain`
     var request: Request { get }
-}
-
-public extension Endpoint {
-    var method: Method { .GET }
 }
 
 public extension Endpoint {
@@ -49,7 +41,7 @@ public extension Endpoint {
         let headers = request.headers
             .map { ($0.name, $0.value?.description) }
 
-        urlRequest.httpMethod = method.rawValue
+        urlRequest.httpMethod = request.method.rawValue
         urlRequest.allHTTPHeaderFields = Dictionary(headers) { h1, _ in h1 }.compactMapValues { $0 }
         urlRequest.allowsCellularAccess = request.allowsCellularAccess
         urlRequest.allowsExpensiveNetworkAccess = request.allowsExpensiveNetworkAccess

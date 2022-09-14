@@ -29,22 +29,22 @@ public final class EndpointPrintLogger: EndpointServiceObserver {
     public init() { }
 
     public func service<E>(_ service: EndpointService, didEncode endpoint: E, for domain: Domain) where E: EncodableEndpoint {
-        print("􀍠 [enc] \(endpoint.method.rawValue) \(endpoint.request.path) | \(E.Input.self)")
+        print("􀍠 [enc] \(endpoint.request.method.rawValue) \(endpoint.request.path) | \(E.Input.self)")
     }
 
     public func service<E>(_ service: EndpointService, didDecode endpoint: E, for domain: Domain) where E: DecodableEndpoint {
-        print("􀍠 [dec] \(endpoint.method.rawValue) \(endpoint.request.path) | \(E.Output.self)")
+        print("􀍠 [dec] \(endpoint.request.method.rawValue) \(endpoint.request.path) | \(E.Output.self)")
     }
 
     public func service<E>(_ service: EndpointService, willBegin endpoint: E, for domain: Domain) where E: Endpoint {
-        print("􀍠 [req] \(endpoint.method.rawValue) \(endpoint.request.path)")
+        print("􀍠 [req] \(endpoint.request.method.rawValue) \(endpoint.request.path)")
     }
 
     public func service<E>(_ service: EndpointService, didFinish endpoint: E, for domain: Domain, duration: TimeInterval) where E: Endpoint {
-        print("􀆅 [res] \(endpoint.method.rawValue) \(endpoint.request.path) (\(formatter.string(from: NSNumber(value: duration)) ?? "0")s)")
+        print("􀆅 [res] \(endpoint.request.method.rawValue) \(endpoint.request.path) (\(formatter.string(from: NSNumber(value: duration)) ?? "0")s)")
     }
 
     public func service<E>(_ service: EndpointService, didFail endpoint: E, for domain: Domain, status code: Int, error: Error) where E: Endpoint {
-        print("􀅾 [res] \(endpoint.method.rawValue) \(endpoint.request.path) | \(code) \(error.localizedDescription)")
+        print("􀅾 [res] \(endpoint.request.method.rawValue) \(endpoint.request.path) | \(code) \(error.localizedDescription)")
     }
 }
