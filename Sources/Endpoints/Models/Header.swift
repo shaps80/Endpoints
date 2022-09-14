@@ -19,7 +19,7 @@ public struct Header {
         self.value = value.rawValue
     }
 
-    public init<V>(_ keyPath: WritableKeyPath<Header, V>, value: V) {
+    public init<V>(_ keyPath: WritableKeyPath<Header, V>, _ value: V) {
         self[keyPath: keyPath] = value
     }
 

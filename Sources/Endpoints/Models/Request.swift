@@ -7,8 +7,8 @@ public struct Request {
     public var path: String
     public var queries: [Query] = []
     public var headers: [Header] = [
-        Header(\.contentType, value: .json),
-        Header(\.accept, value: .json)
+        Header(\.contentType, .json),
+        Header(\.accept, .json)
     ]
 
     /// The cache policy to apply to this endpoint
