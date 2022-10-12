@@ -4,30 +4,33 @@ import XCTest
 final class EndpointsTests: XCTestCase {
     func testDataSuccess() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
-        let (data, response) = try await service.perform(.mockData, from: .mockDomain)
+        let (data, response) = try await service.perform(.mockData)
         XCTAssert(!data.isEmpty)
         XCTAssertEqual(response.statusCode, 200)
     }
 
     func testJSONSuccess() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
-        let (_, response) = try await service.perform(.mockJSON(filename: "gist"), from: .mockDomain)
+        let (_, response) = try await service.perform(.mockJSON(filename: "gist"))
         XCTAssertEqual(response.statusCode, 200)
     }
 
     func testBadStatusCode() async {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 404)
         )
 
         do {
-            _ = try await service.perform(.mockJSON(filename: "gist"), from: .mockDomain)
+            _ = try await service.perform(.mockJSON(filename: "gist"))
             XCTFail("Expected error, got success")
         } catch let EndpointError.badResponse(response) {
             XCTAssertEqual(response.statusCode, 404)
@@ -38,11 +41,12 @@ final class EndpointsTests: XCTestCase {
 
     func testCorruptJSON() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
         do {
-            _ = try await service.perform(.mockJSON(filename: "corrupt"), from: .mockDomain)
+            _ = try await service.perform(.mockJSON(filename: "corrupt"))
             XCTFail("Expected error, got success")
         } catch EndpointError.decoding {
             XCTAssertTrue(true)
@@ -53,11 +57,12 @@ final class EndpointsTests: XCTestCase {
 
     func testMisTypeJSON() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
         do {
-            _ = try await service.perform(.mockJSON(filename: "mistype"), from: .mockDomain)
+            _ = try await service.perform(.mockJSON(filename: "mistype"))
             XCTFail("Expected error, got success")
         } catch EndpointError.decoding {
             XCTAssertTrue(true)
@@ -68,19 +73,21 @@ final class EndpointsTests: XCTestCase {
 
     func testPostJSON() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
-        let (_, response) = try await service.perform(.mockEncodable, from: .mockDomain)
+        let (_, response) = try await service.perform(.mockEncodable)
         XCTAssertEqual(response.statusCode, 200)
     }
 
     func testPostJSONGetJSON() async throws {
         let service = EndpointService(
+            domain: .mockDomain,
             session: MockSession(statusCode: 200)
         )
 
-        let (result, response) = try await service.perform(.mockCodable, from: .mockDomain)
+        let (result, response) = try await service.perform(.mockCodable)
         XCTAssertTrue(result.success)
         XCTAssertEqual(response.statusCode, 200)
     }
