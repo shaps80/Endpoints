@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 public protocol QueryKey {
-    associatedtype Value: CustomStringConvertible
+    associatedtype Value: CustomStringConvertible = String
     static var name: String { get }
 }
 

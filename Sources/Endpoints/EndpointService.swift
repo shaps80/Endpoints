@@ -124,6 +124,7 @@ public extension EndpointService {
     ///   - domain: The `domain` associated with this endpoint
     ///   - body: The body data to include in the URLRequest
     /// - Returns: The data and response returned for this endpoint request
+    @discardableResult
     func perform<E>(_ endpoint: E) async throws -> (Data, HTTPURLResponse)
     where E: EncodableEndpoint, E.Input == Data
     {
@@ -136,6 +137,7 @@ public extension EndpointService {
     ///   - domain: The `domain` associated with this endpoint
     ///   - body: The encodable body to include in the URLRequest
     /// - Returns: The data and response returned for this endpoint request
+    @discardableResult
     func perform<E>(_ endpoint: E) async throws -> (Data, HTTPURLResponse)
     where E: EncodableEndpoint
     {
@@ -147,6 +149,7 @@ public extension EndpointService {
 // MARK: Private
 
 private extension EndpointService {
+    @discardableResult
     func encode<E: EncodableEndpoint>(endpoint: E) throws -> Data {
         do {
             let result = try endpoint.encode()

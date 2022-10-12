@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol HeaderKey {
-    associatedtype Value: CustomStringConvertible
+    associatedtype Value: CustomStringConvertible = String
     static var name: String { get }
 }
 
