@@ -25,6 +25,7 @@ public final class EndpointService {
 }
 
 public extension EndpointService {
+    @discardableResult
     func perform<E>(_ endpoint: E) async throws -> HTTPURLResponse where E: Endpoint {
         try await perform(endpoint, data: nil).1
     }
