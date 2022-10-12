@@ -4,8 +4,7 @@ import XCTest
 final class EndpointsTests: XCTestCase {
     func testDataSuccess() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         let (data, response) = try await service.perform(.mockData)
@@ -15,8 +14,7 @@ final class EndpointsTests: XCTestCase {
 
     func testJSONSuccess() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         let (_, response) = try await service.perform(.mockJSON(filename: "gist"))
@@ -25,8 +23,7 @@ final class EndpointsTests: XCTestCase {
 
     func testBadStatusCode() async {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 404)
+            domain: .mockDomain(code: 404)
         )
 
         do {
@@ -41,8 +38,7 @@ final class EndpointsTests: XCTestCase {
 
     func testCorruptJSON() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         do {
@@ -57,8 +53,7 @@ final class EndpointsTests: XCTestCase {
 
     func testMisTypeJSON() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         do {
@@ -73,8 +68,7 @@ final class EndpointsTests: XCTestCase {
 
     func testPostJSON() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         let (_, response) = try await service.perform(.mockEncodable)
@@ -83,8 +77,7 @@ final class EndpointsTests: XCTestCase {
 
     func testPostJSONGetJSON() async throws {
         let service = EndpointService(
-            domain: .mockDomain,
-            session: MockSession(statusCode: 200)
+            domain: .mockDomain
         )
 
         let (result, response) = try await service.perform(.mockCodable)
@@ -159,22 +152,19 @@ extension Endpoint where Self == MockJSONEndpoint {
 }
 
 private struct MockDomain: Domain {
-    func urlRequest<E>(for endpoint: E) async throws -> URLRequest where E: Endpoint {
+    var statusCode: Int
+    let urlSession = URLSession(configuration: .ephemeral)
+
+    func baseUrl<E>(for endpoint: E) async throws -> URL where E : Endpoint {
         guard let url = Bundle.module.url(forResource: endpoint.request.path, withExtension: "json") else {
             throw EndpointError.badEndpoint("Mock file missing from bundle: \(endpoint.request)")
         }
-
-        return URLRequest(url: url)
+        return url
     }
-}
 
-extension Domain where Self == MockDomain {
-    static var mockDomain: Self { .init() }
-}
-
-private struct MockSession: EndpointSession {
-    var urlSession: URLSession = .init(configuration: .ephemeral)
-    var statusCode: Int = 200
+    func urlRequest<E>(for endpoint: E) async throws -> URLRequest where E: Endpoint {
+        try await URLRequest(url: baseUrl(for: endpoint))
+    }
 
     func data(for request: URLRequest) async throws -> (Data, URLResponse) {
         let data = try Data(contentsOf: request.url!)
@@ -185,5 +175,12 @@ private struct MockSession: EndpointSession {
             headerFields: nil
         )!
         return (data, response)
+    }
+}
+
+extension Domain where Self == MockDomain {
+    static var mockDomain: Self { .init(statusCode: 200) }
+    static func mockDomain(code: Int) -> Self {
+        .init(statusCode: code)
     }
 }

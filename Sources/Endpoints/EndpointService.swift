@@ -1,27 +1,15 @@
 import Foundation
 
-/// Represents a session for an EndpointService
-///
-/// Typically this wraps the `shared` URLSession instance. However you
-/// can provide a custom session (useful in testing) as well.
-public protocol EndpointSession {
-    var urlSession: URLSession { get }
-    /// Returns the data and associated response returned from an API
-    /// - Parameter request: The URL request that should request this data
-    func data(for request: URLRequest) async throws -> (Data, URLResponse)
-}
-
 /// Represents a service that can perform requests against `domains` and their associated `endpoints`
 public final class EndpointService {
-    let session: EndpointSession
+//    let session: EndpointSession
     public let domain: Domain
     private var observers: [ObjectIdentifier: WeakBox] = [:]
 
     /// Creates a new service with the specified session
     /// - Parameter session: The session that will process endpoint requests
-    public init(domain: Domain, session: EndpointSession? = nil, observers: [EndpointServiceObserver] = [EndpointPrintLogger()]) {
+    public init(domain: Domain, observers: [EndpointServiceObserver] = [EndpointPrintLogger()]) {
         self.domain = domain
-        self.session = session ?? Session()
         observers.forEach { register($0) }
     }
 
@@ -208,7 +196,7 @@ private extension EndpointService {
             $0.object?.service(self, willBegin: endpoint)
         }
 
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await domain.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
             try throwError(error: EndpointError.unexpectedResponse(response), status: -1, endpoint: endpoint)
         }
@@ -262,25 +250,6 @@ public enum EndpointError: LocalizedError {
                 .map(\.stringValue)
                 .joined(separator: ".")
             return "\(String(describing: type)).\(path) – \(context.debugDescription)"
-        }
-    }
-}
-
-private final class Session: EndpointSession {
-    var urlSession: URLSession = {
-        let config = URLSessionConfiguration.default
-        config.allowsCellularAccess = true
-        config.allowsExpensiveNetworkAccess = true
-        config.allowsConstrainedNetworkAccess = true
-        config.waitsForConnectivity = false
-        return URLSession(configuration: config)
-    }()
-
-    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
-        if #available(iOS 15, *) {
-            return try await urlSession.data(for: request)
-        } else {
-            return try await urlSession.backport.data(for: request)
         }
     }
 }
